@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.12'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.ksr930'
+version = '0.0.1-SNAPSHOT'
+description = 'myrealtrip'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // 1. Web & Validation (API 서버 및 입력값 검증 필수)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // 2. Data (JPA ORM 필수)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // 3. Database (H2 In-memory DB 필수)
+    // runtimeOnly는 컴파일 땐 필요 없고, 실행될 때만 필요하다는 의미입니다.
+    runtimeOnly 'com.h2database:h2'
+
+    // 4. Migration (Flyway 필수 - DB 스키마 관리)
+    implementation 'org.flywaydb:flyway-core'
+
+    // 5. Developer Tools (Lombok, DevTools)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools' // 서버 재시작 없이 반영 (선택사항)
+
+    // 6. Test (JUnit5 & Platform Launcher)
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
