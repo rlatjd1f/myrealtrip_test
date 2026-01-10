@@ -24,7 +24,8 @@ create table follows (
         foreign key (follower_id) references users(id),
     constraint fk_follows_followee
         foreign key (followee_id) references users(id),
-    constraint uk_follows_pair unique (follower_id, followee_id)
+    constraint uk_follows_pair unique (follower_id, followee_id),
+    constraint chk_follows_not_self check (follower_id <> followee_id)
 );
 create index idx_follows_follower on follows (follower_id);
 create index idx_follows_followee on follows (followee_id);

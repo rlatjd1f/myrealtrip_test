@@ -5,6 +5,7 @@ import com.ksr930.myrealtrip.common.exception.ErrorCode;
 import com.ksr930.myrealtrip.domain.user.User;
 import com.ksr930.myrealtrip.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,11 @@ public class FollowService {
         if (exists) {
             throw new ApiException(ErrorCode.CONFLICT);
         }
-        followRepository.save(new Follow(follower, followee));
+        try {
+            followRepository.save(new Follow(follower, followee));
+        } catch (DataIntegrityViolationException ex) {
+            throw new ApiException(ErrorCode.CONFLICT);
+        }
     }
 
     @Transactional

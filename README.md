@@ -1,5 +1,16 @@
 # myrealtrip_test
 
+소셜 플랫폼의 핵심 기능(포스트 작성/조회, 팔로우 관계, 홈 피드)을 구현한 Spring Boot 기반 API 서버입니다.
+팔로우 관계를 기준으로 최신 포스트를 커서 기반으로 조회할 수 있도록 설계했습니다.
+
+## 기술 스택
+- Java 21
+- Spring Boot 3.2.x
+- Spring Data JPA
+- Flyway
+- H2
+- Gradle
+
 ## 실행 방법
 - 실행: `./gradlew bootRun`
 - 테스트: `./gradlew test`
@@ -181,18 +192,18 @@ PUT /api/comments/5
 ```
 
 ## 도메인 모델 설계
-| 도메인 | 설계 내용                                                                                                         | 관계                                     |
-| --- |---------------------------------------------------------------------------------------------------------------|----------------------------------------|
-| User | 사용자 식별은 `users.id`(PK)로, 표시용 이름은 `users.name`에 저장합니다.                                                         | User 1:N Post<br>User 1:N Comment      |
-| Post | `posts.user_id`(FK)로 작성자(User)와 연결되는 1:N 구조입니다.<br>수정시 `post.content` 컬럼만 갱신합니다.                              | Post N:1 User<br>Post 1:N Comment      |
-| Follow | 사용자 간 N:M 관계를 `follows(follower_id, followee_id)`로 분리합니다.<br>`(follower_id, followee_id)` 유니크로 중복 팔로우를 방지합니다. | User N:M User(Follow)                  |
-| Comment | `comments.post_id`(FK), `comments.user_id`(FK)로 포스트/작성자를 연결합니다.<br>수정시 `comments.content` 컬럼만 갱신합니다.          | Comment N:1 Post<br>Comment N:1 User       |
+| 도메인 | 설계 내용 | 관계 |
+| --- | --- | --- |
+| User | 사용자 식별은 `users.id`(PK)로, 표시용 이름은 `users.name`에 저장합니다. | User 1:N Post<br>User 1:N Comment |
+| Post | `posts.user_id`(FK)로 작성자(User)와 연결되는 1:N 구조입니다.<br>수정 시 `posts.content` 컬럼만 갱신합니다. | Post N:1 User<br>Post 1:N Comment |
+| Follow | 사용자 간 N:M 관계를 `follows(follower_id, followee_id)`로 분리합니다.<br>`(follower_id, followee_id)` 유니크로 중복 팔로우를 방지합니다. | User N:M User(Follow) |
+| Comment | `comments.post_id`(FK), `comments.user_id`(FK)로 포스트/작성자를 연결합니다.<br>수정 시 `comments.content` 컬럼만 갱신합니다. | Comment N:1 Post<br>Comment N:1 User |
 
 ## User–Follow 관계 모델링
 - Follow 엔티티(`follows`)로 사용자 간 N:M 관계를 분리합니다.
 - 컬럼은 `follower_id`(팔로우하는 사용자)와 `followee_id`(팔로우 대상 사용자)로 구성됩니다.
 - `(follower_id, followee_id)` 유니크 제약으로 중복 팔로우를 방지합니다.
-- 자기 자신을 팔로우하는 입력은 서비스에서 차단합니다.
+- 자기 자신 팔로우는 서비스 로직과 DB 체크 제약(`follower_id <> followee_id`)으로 차단합니다.
 
 ## Feed 생성 전략
 - fan-out on read 방식으로 요청 시점에 피드를 구성합니다.
@@ -216,5 +227,9 @@ PUT /api/comments/5
 - FK 제약을 고려해 연관 데이터를 먼저 삭제합니다.
 
 ## 성능 및 확장성 고려
-- 인덱스: `follows(follower_id)`, `posts(user_id, created_at, id)`로 조회 성능을 보강했습니다.
-- 향후 개선: 피드 캐시, 사전 계산(머티리얼라이즈), 복합 커서(`createdAt + id`) 등을 고려할 수 있습니다.
+- 본 프로젝트는 초기 단계 소셜 서비스를 가정하며 별도의 캐시 저장소 없이 RDB만 사용하는 환경을 전제로 합니다.
+- 데이터 복잡도를 낮추고 개발 효율성을 높이기 위해 Pull Model(Fan-out on Read)을 채택했습니다.
+- 향후 조회 성능이 저하될 경우 다음을 단계적으로 적용할 수 있습니다.
+  - 인덱스 보강: `follows(follower_id, followee_id)` 및 `posts(user_id, created_at, id)` 복합 인덱스 최적화와 실행 계획 점검.
+  - 캐싱: 사용자별 피드 결과를 짧은 TTL로 Redis에 저장하고, 새 포스트 작성 시 캐시 무효화 또는 부분 갱신.
+  - Push Model 혼용: 포스트 생성 시 팔로워별 피드 테이블(예: `feed_items`)에 사전 적재하여 읽기 경로를 단순화.
