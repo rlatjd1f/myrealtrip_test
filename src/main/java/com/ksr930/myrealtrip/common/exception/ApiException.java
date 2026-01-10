@@ -13,10 +13,6 @@ public class ApiException extends RuntimeException {
     }
 
     public HttpStatus getStatus() {
-        return switch (errorCode) {
-            case NOT_FOUND -> HttpStatus.NOT_FOUND;
-            case CONFLICT -> HttpStatus.CONFLICT;
-            default -> HttpStatus.BAD_REQUEST;
-        };
+        return errorCode.getHttpStatus();
     }
 }
