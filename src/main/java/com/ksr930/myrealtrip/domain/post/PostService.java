@@ -9,9 +9,11 @@ import com.ksr930.myrealtrip.domain.user.User;
 import com.ksr930.myrealtrip.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -44,13 +46,21 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PageResponse<FeedItemResponse> getFeed(Long followerId, Long cursorId, int size) {
-        List<FeedItemResponse> items = postRepository.findFeedByFollowerId(
-                        followerId,
-                        cursorId,
-                        PageRequest.of(0, size))
+        LocalDateTime cursorCreatedAt = null;
+        if (cursorId != null) {
+            cursorCreatedAt = postRepository.findCreatedAtById(cursorId)
+                    .orElseThrow(() -> new ApiException(ErrorCode.INVALID_REQUEST));
+        }
+
+        Slice<Post> slice = postRepository.findFeedByFollowerId(
+                followerId,
+                cursorCreatedAt,
+                cursorId,
+                PageRequest.of(0, size));
+        List<FeedItemResponse> items = slice.getContent().stream()
                 .map(FeedItemResponse::from)
-                .getContent();
-        Long nextCursor = items.isEmpty() ? null : items.get(items.size() - 1).postId();
+                .toList();
+        Long nextCursor = slice.hasNext() ? items.getLast().postId() : null;
         return new PageResponse<>(items, nextCursor, items.size());
     }
 }

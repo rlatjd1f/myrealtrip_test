@@ -11,12 +11,15 @@ import com.ksr930.myrealtrip.domain.post.PostRepository;
 import com.ksr930.myrealtrip.domain.post.PostService;
 import com.ksr930.myrealtrip.domain.user.User;
 import com.ksr930.myrealtrip.domain.user.UserRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,6 +39,9 @@ class PostServiceTest {
 
     @Autowired
     private FollowService followService;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Test
     @DisplayName("포스트 생성 후 조회할 수 있다")
@@ -78,8 +84,8 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("피드는 id 내림차순과 커서 페이징을 따른다")
-    void feed_returns_descending_id_order_with_cursor() {
+    @DisplayName("피드는 생성 시간 내림차순과 커서 페이징을 따른다")
+    void feed_returns_descending_created_at_order_with_cursor() {
         User follower = userRepository.save(new User("A"));
         User author1 = userRepository.save(new User("B"));
         User author2 = userRepository.save(new User("C"));
@@ -98,5 +104,51 @@ class PostServiceTest {
         PageResponse<FeedItemResponse> secondPage = postService.getFeed(follower.getId(), firstPage.nextCursor(), 2);
         List<Long> secondIds = secondPage.items().stream().map(FeedItemResponse::postId).toList();
         assertThat(secondIds).containsExactly(post1.getId());
+    }
+
+    @Test
+    @DisplayName("피드는 생성 시간이 같으면 id 내림차순으로 정렬된다")
+    void feed_orders_by_id_when_created_at_is_same() {
+        User follower = userRepository.save(new User("A"));
+        User author1 = userRepository.save(new User("B"));
+        User author2 = userRepository.save(new User("C"));
+
+        followService.follow(follower.getId(), author1.getId());
+        followService.follow(follower.getId(), author2.getId());
+
+        Post post1 = postRepository.save(new Post(author1, "first"));
+        Post post2 = postRepository.save(new Post(author2, "second"));
+
+        LocalDateTime sameTime = LocalDateTime.now().minusDays(1);
+        updateCreatedAt(post1.getId(), sameTime);
+        updateCreatedAt(post2.getId(), sameTime);
+        entityManager.flush();
+        entityManager.clear();
+
+        PageResponse<FeedItemResponse> page = postService.getFeed(follower.getId(), null, 10);
+        List<Long> ids = page.items().stream().map(FeedItemResponse::postId).toList();
+        assertThat(ids).containsExactly(post2.getId(), post1.getId());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 커서로 피드를 조회하면 INVALID_REQUEST 예외가 발생한다")
+    void feed_throws_when_cursor_is_invalid() {
+        User follower = userRepository.save(new User("A"));
+        User author = userRepository.save(new User("B"));
+
+        followService.follow(follower.getId(), author.getId());
+        postRepository.save(new Post(author, "first"));
+
+        assertThatThrownBy(() -> postService.getFeed(follower.getId(), 999L, 10))
+                .isInstanceOf(ApiException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.INVALID_REQUEST);
+    }
+
+    private void updateCreatedAt(Long postId, LocalDateTime createdAt) {
+        entityManager.createNativeQuery("update posts set created_at = ? where id = ?")
+                .setParameter(1, Timestamp.valueOf(createdAt))
+                .setParameter(2, postId)
+                .executeUpdate();
     }
 }
