@@ -7,6 +7,7 @@ import com.ksr930.myrealtrip.common.dto.ApiResponse;
 import com.ksr930.myrealtrip.domain.post.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,19 +23,20 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public ApiResponse<PostResponse> createPost(@Valid @RequestBody PostCreateRequest request) {
-        return ApiResponse.success(postService.createPost(request.getUserId(), request.getContent()));
+    public ResponseEntity<ApiResponse<PostResponse>> createPost(@Valid @RequestBody PostCreateRequest request) {
+        return ResponseEntity.status(201)
+                .body(ApiResponse.success(201, postService.createPost(request.userId(), request.content())));
     }
 
     @PutMapping("/{postId}")
-    public ApiResponse<PostResponse> updatePost(
+    public ResponseEntity<ApiResponse<PostResponse>> updatePost(
             @PathVariable Long postId,
             @Valid @RequestBody PostUpdateRequest request) {
-        return ApiResponse.success(postService.updatePost(postId, request.getContent()));
+        return ResponseEntity.ok(ApiResponse.success(postService.updatePost(postId, request.content())));
     }
 
     @GetMapping("/{postId}")
-    public ApiResponse<PostResponse> getPost(@PathVariable Long postId) {
-        return ApiResponse.success(postService.getPost(postId));
+    public ResponseEntity<ApiResponse<PostResponse>> getPost(@PathVariable Long postId) {
+        return ResponseEntity.ok(ApiResponse.success(postService.getPost(postId)));
     }
 }

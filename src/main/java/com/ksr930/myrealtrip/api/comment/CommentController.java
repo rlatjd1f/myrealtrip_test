@@ -8,6 +8,7 @@ import com.ksr930.myrealtrip.common.dto.PageResponse;
 import com.ksr930.myrealtrip.domain.comment.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,32 +26,33 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public ApiResponse<CommentResponse> createComment(@Valid @RequestBody CommentCreateRequest request) {
-        return ApiResponse.success(
-                commentService.createComment(request.getPostId(), request.getUserId(), request.getContent()));
+    public ResponseEntity<ApiResponse<CommentResponse>> createComment(@Valid @RequestBody CommentCreateRequest request) {
+        return ResponseEntity.status(201).body(ApiResponse.success(
+                201,
+                commentService.createComment(request.postId(), request.userId(), request.content())));
     }
 
     @GetMapping
-    public ApiResponse<PageResponse<CommentResponse>> getComments(
+    public ResponseEntity<ApiResponse<PageResponse<CommentResponse>>> getComments(
             @RequestParam Long postId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return ApiResponse.success(commentService.getComments(postId, page, size));
+        return ResponseEntity.ok(ApiResponse.success(commentService.getComments(postId, page, size)));
     }
 
     @DeleteMapping("/{commentId}")
-    public ApiResponse<Void> deleteComment(@PathVariable Long commentId, @RequestParam Long userId) {
+    public ResponseEntity<Void> deleteComment(@PathVariable Long commentId, @RequestParam Long userId) {
         commentService.deleteComment(commentId, userId);
-        return ApiResponse.success(null);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{commentId}")
-    public ApiResponse<CommentResponse> updateComment(
+    public ResponseEntity<ApiResponse<CommentResponse>> updateComment(
             @PathVariable Long commentId,
             @Valid @RequestBody CommentUpdateRequest request) {
-        return ApiResponse.success(commentService.updateComment(
+        return ResponseEntity.ok(ApiResponse.success(commentService.updateComment(
                 commentId,
-                request.getUserId(),
-                request.getContent()));
+                request.userId(),
+                request.content())));
     }
 }

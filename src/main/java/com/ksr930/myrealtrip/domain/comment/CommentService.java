@@ -38,7 +38,7 @@ public class CommentService {
                         PageRequest.of(page, size))
                 .map(CommentResponse::from)
                 .getContent();
-        Long nextCursor = items.isEmpty() ? null : items.get(items.size() - 1).getId();
+        Long nextCursor = items.isEmpty() ? null : items.get(items.size() - 1).id();
         return new PageResponse<>(items, nextCursor, items.size());
     }
 

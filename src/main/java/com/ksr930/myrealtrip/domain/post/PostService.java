@@ -50,7 +50,7 @@ public class PostService {
                         PageRequest.of(0, size))
                 .map(FeedItemResponse::from)
                 .getContent();
-        Long nextCursor = items.isEmpty() ? null : items.get(items.size() - 1).getPostId();
+        Long nextCursor = items.isEmpty() ? null : items.get(items.size() - 1).postId();
         return new PageResponse<>(items, nextCursor, items.size());
     }
 }

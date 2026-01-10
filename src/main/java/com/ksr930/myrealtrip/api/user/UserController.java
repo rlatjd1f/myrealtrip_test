@@ -7,6 +7,7 @@ import com.ksr930.myrealtrip.common.dto.ApiResponse;
 import com.ksr930.myrealtrip.domain.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,25 +24,26 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ApiResponse<UserResponse> createUser(@Valid @RequestBody UserCreateRequest request) {
-        return ApiResponse.success(userService.createUser(request.getName()));
+    public ResponseEntity<ApiResponse<UserResponse>> createUser(@Valid @RequestBody UserCreateRequest request) {
+        return ResponseEntity.status(201)
+                .body(ApiResponse.success(201, userService.createUser(request.name())));
     }
 
     @GetMapping("/{userId}")
-    public ApiResponse<UserResponse> getUser(@PathVariable Long userId) {
-        return ApiResponse.success(userService.getUserResponse(userId));
+    public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(ApiResponse.success(userService.getUserResponse(userId)));
     }
 
     @PutMapping("/{userId}")
-    public ApiResponse<UserResponse> updateUser(
+    public ResponseEntity<ApiResponse<UserResponse>> updateUser(
             @PathVariable Long userId,
             @Valid @RequestBody UserUpdateRequest request) {
-        return ApiResponse.success(userService.updateUser(userId, request.getName()));
+        return ResponseEntity.ok(ApiResponse.success(userService.updateUser(userId, request.name())));
     }
 
     @DeleteMapping("/{userId}")
-    public ApiResponse<Void> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
-        return ApiResponse.success(null);
+        return ResponseEntity.noContent().build();
     }
 }
