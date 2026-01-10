@@ -27,7 +27,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -100,7 +100,7 @@ class UserControllerTest {
     @Test
     @DisplayName("사용자 수정 API는 name 누락/공백이면 에러를 반환한다")
     void update_user_validation_error() throws Exception {
-        mockMvc.perform(put("/api/users/1")
+        mockMvc.perform(patch("/api/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new UserUpdateRequest(""))))
                 .andExpect(status().isBadRequest())
@@ -114,7 +114,7 @@ class UserControllerTest {
         when(userService.updateUser(eq(999L), anyString()))
                 .thenThrow(new ApiException(ErrorCode.NOT_FOUND));
 
-        mockMvc.perform(put("/api/users/999")
+        mockMvc.perform(patch("/api/users/999")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new UserUpdateRequest("Alice"))))
                 .andExpect(status().isNotFound())

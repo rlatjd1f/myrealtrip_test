@@ -22,14 +22,14 @@
 | --- | --- | --- |
 | POST | `/api/users` | 사용자 생성 |
 | GET | `/api/users/{userId}` | 사용자 조회 |
-| PUT | `/api/users/{userId}` | 사용자 수정 |
+| PATCH | `/api/users/{userId}` | 사용자 수정 |
 | DELETE | `/api/users/{userId}` | 사용자 삭제 |
 
 ### 포스트(Post)
 | HTTP Method | URL | 기능 |
 | --- | --- | --- |
 | POST | `/api/posts` | 포스트 작성 |
-| PUT | `/api/posts/{postId}` | 포스트 수정 |
+| PATCH | `/api/posts/{postId}` | 포스트 수정 |
 | GET | `/api/posts/{postId}` | 포스트 조회 |
 
 ### 팔로우(Follow)
@@ -48,7 +48,7 @@
 | --- | --- | --- |
 | POST | `/api/comments` | 댓글 작성 |
 | GET | `/api/comments?postId=&page=&size=` | 댓글 조회 |
-| PUT | `/api/comments/{commentId}` | 댓글 수정 |
+| PATCH | `/api/comments/{commentId}` | 댓글 수정 |
 | DELETE | `/api/comments/{commentId}?userId=` | 댓글 삭제 |
 
 ## API 요청/응답 예시
@@ -148,7 +148,7 @@ GET /api/feed?followerId=1&cursorId=10&size=20
 ### 댓글 수정
 - 요청
 ```json
-PUT /api/comments/5
+PATCH /api/comments/5
 {
   "userId": 1,
   "content": "댓글 수정"
@@ -173,7 +173,7 @@ PUT /api/comments/5
 ### 에러 응답 예시
 - 요청
 ```json
-PUT /api/comments/5
+PATCH /api/comments/5
 {
   "userId": 2,
   "content": "댓글 수정"

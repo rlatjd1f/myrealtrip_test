@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -76,7 +76,7 @@ class CommentControllerTest {
     @Test
     @DisplayName("댓글 수정 API는 userId 누락 시 에러를 반환한다")
     void update_comment_validation_error() throws Exception {
-        mockMvc.perform(put("/api/comments/1")
+        mockMvc.perform(patch("/api/comments/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new CommentUpdateRequest(null, "hi"))))
                 .andExpect(status().isBadRequest())
@@ -107,7 +107,7 @@ class CommentControllerTest {
         doThrow(new ApiException(ErrorCode.NOT_FOUND))
                 .when(commentService).updateComment(eq(999L), anyLong(), anyString());
 
-        mockMvc.perform(put("/api/comments/999")
+        mockMvc.perform(patch("/api/comments/999")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new CommentUpdateRequest(1L, "hi"))))
                 .andExpect(status().isNotFound())

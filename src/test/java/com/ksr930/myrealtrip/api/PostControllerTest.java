@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -72,7 +72,7 @@ class PostControllerTest {
     @Test
     @DisplayName("포스트 수정 API는 content 공백이면 에러를 반환한다")
     void update_post_validation_error() throws Exception {
-        mockMvc.perform(put("/api/posts/1")
+        mockMvc.perform(patch("/api/posts/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new PostUpdateRequest(""))))
                 .andExpect(status().isBadRequest())
@@ -97,7 +97,7 @@ class PostControllerTest {
         when(postService.updatePost(eq(999L), anyString()))
                 .thenThrow(new ApiException(ErrorCode.NOT_FOUND));
 
-        mockMvc.perform(put("/api/posts/999")
+        mockMvc.perform(patch("/api/posts/999")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new PostUpdateRequest("update"))))
                 .andExpect(status().isNotFound())
