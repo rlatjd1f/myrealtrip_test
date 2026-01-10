@@ -14,7 +14,7 @@
 ## 실행 방법
 - 실행: `./gradlew bootRun`
 - 테스트: `./gradlew test`
-- 간단한 API 검증 스크립트 실행: `./tmp_api_test.sh`
+- 간단한 API 검증 스크립트 실행: `python3 tmp_api_test.py`
 
 ## 로컬 API 검증 스크립트
 - 파일: `tmp_api_test.py`
