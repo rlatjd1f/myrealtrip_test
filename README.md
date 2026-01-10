@@ -18,38 +18,38 @@
 ## 주요 API
 
 ### 사용자(User)
-| HTTP Method | URL | 기능 | 비고 |
-| --- | --- | --- | --- |
-| POST | `/api/users` | 사용자 생성 |  |
-| GET | `/api/users/{userId}` | 사용자 조회 |  |
-| PUT | `/api/users/{userId}` | 사용자 수정 |  |
-| DELETE | `/api/users/{userId}` | 사용자 삭제 | 연관 데이터 삭제 |
+| HTTP Method | URL | 기능 |
+| --- | --- | --- |
+| POST | `/api/users` | 사용자 생성 |
+| GET | `/api/users/{userId}` | 사용자 조회 |
+| PUT | `/api/users/{userId}` | 사용자 수정 |
+| DELETE | `/api/users/{userId}` | 사용자 삭제 |
 
 ### 포스트(Post)
-| HTTP Method | URL | 기능 | 비고 |
-| --- | --- | --- | --- |
-| POST | `/api/posts` | 포스트 작성 |  |
-| PUT | `/api/posts/{postId}` | 포스트 수정 |  |
-| GET | `/api/posts/{postId}` | 포스트 조회 |  |
+| HTTP Method | URL | 기능 |
+| --- | --- | --- |
+| POST | `/api/posts` | 포스트 작성 |
+| PUT | `/api/posts/{postId}` | 포스트 수정 |
+| GET | `/api/posts/{postId}` | 포스트 조회 |
 
 ### 팔로우(Follow)
-| HTTP Method | URL | 기능 | 비고 |
-| --- | --- | --- | --- |
-| POST | `/api/follows` | 팔로우 |  |
-| DELETE | `/api/follows?followerId=&followeeId=` | 언팔로우 |  |
+| HTTP Method | URL | 기능 |
+| --- | --- | --- |
+| POST | `/api/follows` | 팔로우 |
+| DELETE | `/api/follows?followerId=&followeeId=` | 언팔로우 |
 
 ### 피드(Feed)
-| HTTP Method | URL | 기능 | 비고 |
-| --- | --- | --- | --- |
-| GET | `/api/feed?followerId=&cursorId=&size=` | 홈 피드 조회 | 커서 기반 |
+| HTTP Method | URL | 기능 |
+| --- | --- | --- |
+| GET | `/api/feed?followerId=&cursorId=&size=` | 홈 피드 조회 |
 
 ### 댓글(Comment)
-| HTTP Method | URL | 기능 | 비고 |
-| --- | --- | --- | --- |
-| POST | `/api/comments` | 댓글 작성 |  |
-| GET | `/api/comments?postId=&page=&size=` | 댓글 조회 | 페이지 기반 |
-| PUT | `/api/comments/{commentId}` | 댓글 수정 | 요청 본문에 userId 필요 |
-| DELETE | `/api/comments/{commentId}?userId=` | 댓글 삭제 | 작성자 검증 |
+| HTTP Method | URL | 기능 |
+| --- | --- | --- |
+| POST | `/api/comments` | 댓글 작성 |
+| GET | `/api/comments?postId=&page=&size=` | 댓글 조회 |
+| PUT | `/api/comments/{commentId}` | 댓글 수정 |
+| DELETE | `/api/comments/{commentId}?userId=` | 댓글 삭제 |
 
 ## API 요청/응답 예시
 
@@ -64,7 +64,7 @@ POST /api/users
 - 응답
 ```json
 {
-  "status": 200,
+  "status": 201,
   "code": "OK",
   "message": "성공",
   "data": {
@@ -87,7 +87,7 @@ POST /api/posts
 - 응답
 ```json
 {
-  "status": 200,
+  "status": 201,
   "code": "OK",
   "message": "성공",
   "data": {
@@ -112,7 +112,7 @@ POST /api/follows
 - 응답
 ```json
 {
-  "status": 200,
+  "status": 201,
   "code": "OK",
   "message": "성공",
   "data": null
