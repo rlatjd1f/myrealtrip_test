@@ -14,6 +14,14 @@
 ## 실행 방법
 - 실행: `./gradlew bootRun`
 - 테스트: `./gradlew test`
+- 간단한 API 검증 스크립트 실행: `./tmp_api_test.sh`
+
+## 로컬 API 검증 스크립트
+- 파일: `tmp_api_test.py`
+- 서버가 `localhost:8080`에서 실행 중이어야 합니다.
+- 실행: `python3 tmp_api_test.py`
+- 사용자 5명 생성, 팔로우 관계 설정, 유저당 10~20건 포스트 생성 후 피드/댓글/수정/삭제 등 전체 API를 순서대로 호출합니다.
+- 응답을 검증하며, 피드 조회는 팔로우 관계와 정렬 기준(createdAt desc, id desc)까지 확인합니다.
 
 ## 주요 API
 
