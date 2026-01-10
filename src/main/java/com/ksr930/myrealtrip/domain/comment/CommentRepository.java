@@ -12,9 +12,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from Comment c where c.user.id = :userId")
-    int deleteByUserId(@Param("userId") Long userId);
+    void deleteByUserId(@Param("userId") Long userId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from Comment c where c.post.user.id = :userId")
-    int deleteByPostUserId(@Param("userId") Long userId);
+    void deleteByPostUserId(@Param("userId") Long userId);
 }

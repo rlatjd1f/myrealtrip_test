@@ -19,5 +19,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from Post p where p.user.id = :userId")
-    int deleteByUserId(@Param("userId") Long userId);
+    void deleteByUserId(@Param("userId") Long userId);
 }
