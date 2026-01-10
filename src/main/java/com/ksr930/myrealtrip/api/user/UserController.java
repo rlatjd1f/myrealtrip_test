@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 @RestController
 @RequestMapping("/api/users")
@@ -36,5 +37,11 @@ public class UserController {
             @PathVariable Long userId,
             @Valid @RequestBody UserUpdateRequest request) {
         return ApiResponse.success(userService.updateUser(userId, request.getName()));
+    }
+
+    @DeleteMapping("/{userId}")
+    public ApiResponse<Void> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+        return ApiResponse.success(null);
     }
 }

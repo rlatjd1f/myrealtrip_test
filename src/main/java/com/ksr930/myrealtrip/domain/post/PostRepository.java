@@ -3,6 +3,7 @@ package com.ksr930.myrealtrip.domain.post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -15,4 +16,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("followerId") Long followerId,
             @Param("cursorId") Long cursorId,
             Pageable pageable);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from Post p where p.user.id = :userId")
+    int deleteByUserId(@Param("userId") Long userId);
 }
